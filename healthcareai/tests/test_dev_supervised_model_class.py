@@ -94,7 +94,7 @@ class TestLinearDevTuneFalse(unittest.TestCase):
 
     def runTest(self):
 
-        self.assertAlmostEqual(np.round(self.o.au_roc, 6), 0.671884)
+        self.assertAlmostEqual(np.round(self.o.au_roc, 6), 0.672075)
 
     def tearDown(self):
         del self.o
