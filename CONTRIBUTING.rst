@@ -1,14 +1,23 @@
 How to set up your dev environment (Windows-specific)
 -------------------
 
-Set up Git
+Set up git
 =============
-- Download and install Git for Windows: https://git-scm.com/download/win
-- Choose Use Git from Git Bash only
+- Download and install git for Windows: https://git-scm.com/download/win
+- Choose "64-bit Git for Windows Setup"
+- On the Select Components screen, accept the defaults
+- After selecting install location, choose "Use Git from the Windows Command Prompt"
 - Checkout using Windows-style
-- Chose Mintty
+- Choose MinTTy
 
-Install healthcareai via these instuctions: https://github.com/HealthCatalystSLC/healthcareai-py/blob/master/README.rst
+Set up healthcare-ai
+====================
+- Download Anaconda for Windows (Python 3.5) https://www.continuum.io/downloads
+- In terminal, run ``git clone git@github.com:HealthCatalystSLC/healthcareai-py.git``
+- ``cd`` to healthcareai-py directory
+- In terminal, run ``conda env create`` to create the hcconda virtual environment
+- To activate your virtual environment, in terminal run ``activate hcconda`` (or ``source activate hcconda`` if using bash)
+- To set hcconda as your default conda environment (not required), run ``conda config --set core.default_env=hcconda``
 
 Install the IDE and clone the healthcareai-py repo
 =============
@@ -18,9 +27,7 @@ Install the IDE and clone the healthcareai-py repo
 2)	Set path to git.exe via File -> settings -> Version Control -> Git
 
 3)	Clone repo (if you haven't) via PyCharm -> VCS (at top) -> Checkout from version control -> Github
- - Grab .git url from HCRTools repo in Github
- - Set parent directory to C:/Source
- - Name directory healthcareai-py
+ - Grab .git url from healthcareai-py repo in Github
 
 4)	File -> Open and look for the healthcareai project (if it didn’t come up already)
 
@@ -110,3 +117,5 @@ Set up your email and username for git (otherwise no attribution in github)
  .. _Step1: https://help.github.com/articles/generating-a-new-ssh-key-and-adding-it-to-the-ssh-agent/
  .. _Step2: https://help.github.com/articles/adding-a-new-ssh-key-to-your-github-account/
  .. _Step3: https://help.github.com/enterprise/11.10.340/user/articles/changing-a-remote-s-url/
+ 
+4) Make git case sensitive: ``git config core.ignorecase false``
