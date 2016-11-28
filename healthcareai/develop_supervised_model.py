@@ -61,30 +61,6 @@ class DevelopSupervisedModel(object):
         self.y_test = None
         self.au_roc = None
 
-        # Validate dataframe and column before doing any additional work
-        is_valid_df_and_column = self.validate_dataframe_and_column(dataframe=self.df, column=self.predictedcol)
-        if is_valid_df_and_column is not True:
-            print(is_valid_df_and_column)
-            raise RuntimeError(is_valid_df_and_column)
-
-        # Regressions require non-binary numeric data
-        if self.modeltype == 'regression':
-            is_numeric = self.is_column_numeric(dataframe=self.df, column=self.predictedcol)
-            if is_numeric is True:
-                pass
-            elif is_numeric is False:
-                error_message = ('Regression requires a numeric column with continuous numeric data. The predicted column %s is not a numeric column.' % self.predictedcol)
-                print(error_message)
-                raise RuntimeError(error_message)
-            else:
-                print(is_numeric)
-                raise RuntimeError(is_numeric)
-
-            if self.is_column_binary(dataframe=self.df, column=self.predictedcol):
-                error_message = ('Regression requires a numeric column with continuous numeric data. The predicted column %s is a binary column.' % self.predictedcol)
-                print(error_message)
-                raise RuntimeError(error_message)
-
         if debug:
             print('Shape and top 5 rows of original dataframe:')
             print(self.df.shape)
@@ -124,24 +100,14 @@ class DevelopSupervisedModel(object):
             print(self.df.head())
 
         #CALL new function!!
+        # Convert predicted col to 0/1 (otherwise won't work with GridSearchCV)
         # Note that this makes healthcareai only handle N/Y in pred column
-        # TODO Make this able to use any binary column N/Y, 0/1, CMV+/CMV-, T/F, True/False, etc
-        # Classification requires a binary column for prediction
         if self.modeltype == 'classification':
-            is_binary = self.is_column_binary(dataframe=self.df, column=self.predictedcol)
-            if is_binary is True:
-                # TODO: Also check that the unique values are 'Y' or 'N' and warn if they are not
-
-                # Convert predicted col to 0/1 (otherwise won't work with GridSearchCV)
-                # Turning off warning around replace
-                pd.options.mode.chained_assignment = None  # default='warn'
-                self.df[self.predictedcol].replace(['Y', 'N'], [1, 0], inplace=True)
-            elif is_binary is False:
-                print('Classification requires a binary column with "Y" or "N" values. The predicted column %s is not a binary column.' % self.predictedcol)
-                raise RuntimeError('Classification requires a binary column with "Y" or "N" values. The predicted column %s is not a binary column.' % self.predictedcol)
-            else:
-                print(is_binary)
-                raise RuntimeError(is_binary)
+            # Turning off warning around replace
+            pd.options.mode.chained_assignment = None  # default='warn'
+            # TODO: put try/catch here when type = class and predictor is numer
+            self.df[self.predictedcol].replace(['Y', 'N'], [1, 0],
+                                               inplace=True)
 
             if debug:
                 print('\nDataframe after converting to 1/0 instead of Y/N for '
@@ -176,58 +142,6 @@ class DevelopSupervisedModel(object):
             print(self.y_train.shape)
             print(self.X_test.shape)
             print(self.y_test.shape)
-
-
-    @staticmethod
-    def validate_dataframe_and_column(dataframe=None, column=None):
-        """
-        Validates that a given dataframe is a pandas dataframe that contains the specified column.
-        Intentionally tries to be helpful by printing human readable error messages rather than returning False.
-        :param dataframe: the dataframe
-        :param column: the column name
-        :return: True or returns various helpful errors upon failures.
-        """
-
-        if dataframe is None:
-            return ('There may be a problem. Your dataframe is null.')
-
-        if column is None:
-            return ('There may be a problem. Your column is null.')
-
-        if type(dataframe) is not pd.core.frame.DataFrame:
-            return ('There may be a problem. You did not pass in a dataframe.')
-        else:
-            if column in dataframe.columns:
-                # Successful validation
-                return True
-            else:
-                return ('There may be a problem. The column %s does not exist.' % column)
-
-
-    @staticmethod
-    def is_column_numeric(dataframe=None, column=None):
-        """
-        Checks if a dataframe column is numeric. Assumes a valid dataframe and column.
-        :param dataframe: the dataframe
-        :param column: the column name
-        :return: True or False
-        """
-
-        return dataframe[column].dtype in [np.integer, np.number, np.float]
-
-
-    @staticmethod
-    def is_column_binary(dataframe=None, column=None):
-        """
-        Checks if the data in a column is boolean-like, or in other words, has only two values.
-        Assumes a valid dataframe and column.
-        :param dataframe: your dataframe
-        :param column: the column name as a string
-        :return: True or False
-        """
-
-        # Some find this has higher performance than a simple df[col].nunique()
-        return len(dataframe[column].unique()) == 2
 
     def linear(self, cores=4, debug=False):
         """
