@@ -79,16 +79,10 @@ class DevelopSupervisedModel(object):
 
         # Regressions require non-binary numeric data
         if self.modeltype == 'regression':
-            is_numeric = self.is_column_numeric(dataframe=self.df, column=self.predictedcol)
-            if is_numeric is True:
-                pass
-            elif is_numeric is False:
+            if not self.is_column_numeric(dataframe=self.df, column=self.predictedcol):
                 error_message = (REGRESSION_ERROR_NON_NUMERIC % self.predictedcol)
                 print(error_message)
                 raise RuntimeError(error_message)
-            else:
-                print(is_numeric)
-                raise RuntimeError(is_numeric)
 
             if self.is_column_binary(dataframe=self.df, column=self.predictedcol):
                 error_message = (REGRESSION_ERROR_BINARY % self.predictedcol)
@@ -132,20 +126,16 @@ class DevelopSupervisedModel(object):
         # TODO Make this able to use any binary column N/Y, 0/1, CMV+/CMV-, T/F, True/False, etc
         # Classification requires a binary column for prediction
         if self.modeltype == 'classification':
-            is_binary = self.is_column_binary(dataframe=self.df, column=self.predictedcol)
-            if is_binary is True:
+            if self.is_column_binary(dataframe=self.df, column=self.predictedcol):
                 # TODO: Also check that the unique values are 'Y' or 'N' and warn if they are not
 
                 # Convert predicted col to 0/1 (otherwise won't work with GridSearchCV)
                 # Turning off warning around replace
                 pd.options.mode.chained_assignment = None  # default='warn'
                 self.df[self.predictedcol].replace(['Y', 'N'], [1, 0], inplace=True)
-            elif is_binary is False:
+            else:
                 print(CLASSIFICATION_ERROR % self.predictedcol)
                 raise RuntimeError(CLASSIFICATION_ERROR % self.predictedcol)
-            else:
-                print(is_binary)
-                raise RuntimeError(is_binary)
 
             if debug:
                 print('\nDataframe after converting to 1/0 instead of Y/N for '
@@ -283,11 +273,11 @@ class DevelopSupervisedModel(object):
         # TODO: refactor, such that each algo doesn't need an if/else tree
         if self.modeltype == 'classification':
             algo = RandomForestClassifier(n_estimators=trees,
-                                          verbose=(2 if debug is True else 0))
+                                          verbose=(2 if debug else 0))
 
         elif self.modeltype == 'regression':
             algo = RandomForestRegressor(n_estimators=trees,
-                                         verbose=(2 if debug is True else 0))
+                                         verbose=(2 if debug else 0))
 
         else:  # Here to appease pep8
             algo = None
