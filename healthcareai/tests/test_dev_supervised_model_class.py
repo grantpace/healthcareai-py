@@ -195,32 +195,32 @@ class TestDataframeAndColumnValidationInContextOfModels(unittest.TestCase):
     def test_raise_error_on_non_dataframe_on_classification_and_regression(self):
         not_a_dataframe = [1,2,3,4,5]
         for model in ['regression', 'classification']:
-            try:
-                o = DevelopSupervisedModel(modeltype=model,
-                                           df=not_a_dataframe,
-                                           predictedcol='Not a real column',
-                                           impute=True)
-            except RuntimeError as e:
-                correct_error = dsm.DATA_FRAME_ERROR
-                self.assertEqual(correct_error, e.args[0])
-            else:
-                self.fail('No error raised.')
+            with self.assertRaises(TypeError) as contextManager:
+                DevelopSupervisedModel(
+                    modeltype=model,
+                    df=not_a_dataframe,
+                    predictedcol='GenderFLG',
+                    impute=True)
+
+            self.assertEqual(
+                contextManager.exception.args[0],
+                dsm.DATA_FRAME_ERROR)
 
     def test_raise_error_on_non_existent_column_on_classification_and_regression(self):
         df = pd.read_csv(fixture('HCPyDiabetesClinical.csv'),
                          na_values=['None'])
         fake_column_name = 'NotARealColumn'
         for model in ['regression', 'classification']:
-            try:
-                o = DevelopSupervisedModel(modeltype=model,
-                                           df=df,
-                                           predictedcol=fake_column_name,
-                                           impute=True)
-            except RuntimeError as e:
-                correct_error = dsm.COLUMN_ERROR % fake_column_name
-                self.assertEqual(correct_error, e.args[0])
-            else:
-                self.fail('No error raised.')
+            with self.assertRaises(dsm.ColumnError) as contextManager:
+                DevelopSupervisedModel(
+                    modeltype=model,
+                    df=df,
+                    predictedcol=fake_column_name,
+                    impute=True)
+
+            self.assertEqual(
+                contextManager.exception.args[0],
+                dsm.COLUMN_ERROR % fake_column_name)
 
 
 class TestBinaryColumnChecking(unittest.TestCase):

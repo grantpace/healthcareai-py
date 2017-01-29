@@ -75,10 +75,7 @@ class DevelopSupervisedModel(object):
         self.au_roc = None
 
         # Validate dataframe and column before doing any additional work
-        is_valid_df_and_column = self.validate_dataframe_and_column(dataframe=self.df, column=self.predictedcol)
-        if is_valid_df_and_column is not True:
-            print(is_valid_df_and_column)
-            raise RuntimeError(is_valid_df_and_column)
+        self.validate_dataframe_and_column(dataframe=self.df, column=self.predictedcol)
 
         # Regressions require non-binary numeric data
         if self.modeltype == 'regression':
