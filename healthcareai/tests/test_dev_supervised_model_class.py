@@ -5,6 +5,7 @@ import numpy as np
 import pandas as pd
 
 from healthcareai import DevelopSupervisedModel
+import healthcareai.develop_supervised_model as dsm
 from healthcareai.tests.helpers import fixture
 
 
@@ -122,7 +123,7 @@ class TestErrorHandlingOnIncorrectColumnsForModels(unittest.TestCase):
                                        predictedcol=predictedcol,
                                        impute=True)
         except RuntimeError as e:
-            correct_error = 'Regression requires a numeric column with continuous numeric data. The predicted column %s is a binary column.' % predictedcol
+            correct_error = dsm.REGRESSION_ERROR_BINARY % predictedcol
             self.assertEqual(correct_error, e.args[0])
         else:
             self.fail('No error raised.')
@@ -140,7 +141,7 @@ class TestErrorHandlingOnIncorrectColumnsForModels(unittest.TestCase):
                                        predictedcol=predictedcol,
                                        impute=True)
         except RuntimeError as e:
-            correct_error = 'Regression requires a numeric column with continuous numeric data. The predicted column %s is not a numeric column.' % predictedcol
+            correct_error = dsm.REGRESSION_ERROR_NON_NUMERIC % predictedcol
             self.assertEqual(correct_error, e.args[0])
         else:
             self.fail('No error raised.')
@@ -156,7 +157,7 @@ class TestErrorHandlingOnIncorrectColumnsForModels(unittest.TestCase):
                                        predictedcol=predictedcol,
                                        impute=True)
         except RuntimeError as e:
-            correct_error = ('Classification requires a binary column with "Y" or "N" values. The predicted column %s is not a binary column.' % predictedcol)
+            correct_error = dsm.CLASSIFICATION_ERROR % predictedcol
             self.assertEqual(correct_error, e.args[0])
         else:
             self.fail('No error raised.')
@@ -173,7 +174,7 @@ class TestDataframeAndColumnValidation(unittest.TestCase):
 
         self.assertEqual(
             contextManager.exeception.args[0],
-            dsm.DATA_FRAME_ERROR_MSG)
+            dsm.DATA_FRAME_ERROR)
 
     def test_raise_error_on_non_existent_column(self):
         non_existent_column = 'fake_column'
@@ -182,7 +183,7 @@ class TestDataframeAndColumnValidation(unittest.TestCase):
 
         self.assertEqual(
             contextManager.exception.args[0],
-            dsm.COLUMN_ERROR_MSG % non_existent_column)
+            dsm.COLUMN_ERROR % non_existent_column)
 
     def test_successful_validation(self):
         # If any exception is raised, the test will fail.
@@ -200,7 +201,7 @@ class TestDataframeAndColumnValidationInContextOfModels(unittest.TestCase):
                                            predictedcol='Not a real column',
                                            impute=True)
             except RuntimeError as e:
-                correct_error = 'There may be a problem. You did not pass in a dataframe.'
+                correct_error = dsm.DATA_FRAME_ERROR
                 self.assertEqual(correct_error, e.args[0])
             else:
                 self.fail('No error raised.')
@@ -216,7 +217,7 @@ class TestDataframeAndColumnValidationInContextOfModels(unittest.TestCase):
                                            predictedcol=fake_column_name,
                                            impute=True)
             except RuntimeError as e:
-                correct_error = ('There may be a problem. The column %s does not exist.' % fake_column_name)
+                correct_error = dsm.COLUMN_ERROR % fake_column_name
                 self.assertEqual(correct_error, e.args[0])
             else:
                 self.fail('No error raised.')

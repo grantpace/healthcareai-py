@@ -11,6 +11,18 @@ from healthcareai.common import filters
 import os
 
 
+DATA_FRAME_ERROR = 'There may be a problem. You did not pass in a dataframe.'
+COLUMN_ERROR = 'There may be a problem. The column %s does not exist.'
+REGRESSION_ERROR = 'Regression requires a numeric column with continuous numeric data.'
+REGRESSION_ERROR_NON_NUMERIC = REGRESSION_ERROR + ' The predicted column %s is not a numeric column.'
+REGRESSION_ERROR_BINARY = REGRESSION_ERROR + ' The predicted column %s is a binary column.'
+CLASSIFICATION_ERROR = 'Classification requires a binary column with "Y" or "N" values. The predicted column %s is not a binary column.'
+
+
+class ColumnError(KeyError):
+    pass
+
+
 class DevelopSupervisedModel(object):
     """
     This class helps create a model using several common classifiers
@@ -74,7 +86,7 @@ class DevelopSupervisedModel(object):
             if is_numeric is True:
                 pass
             elif is_numeric is False:
-                error_message = ('Regression requires a numeric column with continuous numeric data. The predicted column %s is not a numeric column.' % self.predictedcol)
+                error_message = (REGRESSION_ERROR_NON_NUMERIC % self.predictedcol)
                 print(error_message)
                 raise RuntimeError(error_message)
             else:
@@ -82,7 +94,7 @@ class DevelopSupervisedModel(object):
                 raise RuntimeError(is_numeric)
 
             if self.is_column_binary(dataframe=self.df, column=self.predictedcol):
-                error_message = ('Regression requires a numeric column with continuous numeric data. The predicted column %s is a binary column.' % self.predictedcol)
+                error_message = (REGRESSION_ERROR_BINARY % self.predictedcol)
                 print(error_message)
                 raise RuntimeError(error_message)
 
@@ -132,8 +144,8 @@ class DevelopSupervisedModel(object):
                 pd.options.mode.chained_assignment = None  # default='warn'
                 self.df[self.predictedcol].replace(['Y', 'N'], [1, 0], inplace=True)
             elif is_binary is False:
-                print('Classification requires a binary column with "Y" or "N" values. The predicted column %s is not a binary column.' % self.predictedcol)
-                raise RuntimeError('Classification requires a binary column with "Y" or "N" values. The predicted column %s is not a binary column.' % self.predictedcol)
+                print(CLASSIFICATION_ERROR % self.predictedcol)
+                raise RuntimeError(CLASSIFICATION_ERROR % self.predictedcol)
             else:
                 print(is_binary)
                 raise RuntimeError(is_binary)
@@ -180,16 +192,14 @@ class DevelopSupervisedModel(object):
         Intentionally tries to be helpful by printing human readable error messages rather than returning False.
         :param dataframe: the dataframe
         :param column: the column name
-        :return: True or returns various helpful errors upon failures.
+        :return: None
+        :raises helpful exceptions upon failures.
         """
         if type(dataframe) is not pd.core.frame.DataFrame:
-            return ('There may be a problem. You did not pass in a dataframe.')
+            raise TypeError(DATA_FRAME_ERROR)
         else:
-            if column in dataframe.columns:
-                # Successful validation
-                return True
-            else:
-                return ('There may be a problem. The column %s does not exist.' % column)
+            if column not in dataframe.columns:
+                raise ColumnError(COLUMN_ERROR % column)
 
 
     @staticmethod
