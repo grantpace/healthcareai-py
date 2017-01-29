@@ -105,8 +105,10 @@ def clfreport(modeltype,
 
         # Print variable importance if rf and not tuning
         elif hasattr(clf, 'feature_importances_'):
+            # pylint: disable=no-member
             write_feature_importances(clf.feature_importances_,
                                           col_list)
+            # pylint: enable=no-member
 
             return y_pred, roc_auc, clf
 

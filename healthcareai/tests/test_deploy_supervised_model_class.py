@@ -6,13 +6,23 @@ import pandas as pd
 from healthcareai import DeploySupervisedModel
 from healthcareai.tests.helpers import fixture
 
+# pandas read_csv method is dynamically created, and pylint is not able to
+# determine that the return type will be a DataFrame
+# pylint: disable=no-member
+def _DoDrop(df, *args, **kwargs):
+    df.drop(*args, **kwargs)
+# pylint: enable=no-member
+
+
 
 class TestRFDeployNoTreesNoMtry(unittest.TestCase):
     def setUp(self):
         df = pd.read_csv(fixture('HCPyDiabetesClinical.csv'),
                          na_values=['None'])
-        df.drop('PatientID', axis=1, inplace=True)  # drop uninformative column
+        _DoDrop(df, 'PatientID', axis=1, inplace=True)  # drop uninformative column
+        # pylint: disable=no-member
         print(df.head())
+        # pylint: enable=no-member
 
         np.random.seed(42)
         self.o = DeploySupervisedModel(modeltype='classification',
@@ -40,7 +50,7 @@ class TestRFDeployNoTreesWithMtry(unittest.TestCase):
     def setUp(self):
         df = pd.read_csv(fixture('HCPyDiabetesClinical.csv'),
                          na_values=['None'])
-        df.drop('PatientID', axis=1, inplace=True)  # drop uninformative column
+        _DoDrop(df, 'PatientID', axis=1, inplace=True)  # drop uninformative column
 
         np.random.seed(42)
         self.o = DeploySupervisedModel(modeltype='classification',
@@ -69,7 +79,7 @@ class TestRFDeployWithTreesNoMtry(unittest.TestCase):
     def setUp(self):
         df = pd.read_csv(fixture('HCPyDiabetesClinical.csv'),
                          na_values=['None'])
-        df.drop('PatientID', axis=1, inplace=True)  # drop uninformative column
+        _DoDrop(df, 'PatientID', axis=1, inplace=True)  # drop uninformative column
 
         np.random.seed(42)
         self.o = DeploySupervisedModel(modeltype='classification',
@@ -98,7 +108,7 @@ class TestLinearDeploy(unittest.TestCase):
     def setUp(self):
         df = pd.read_csv(fixture('HCPyDiabetesClinical.csv'),
                          na_values=['None'])
-        df.drop('PatientID', axis=1, inplace=True)  # drop uninformative column
+        _DoDrop(df, 'PatientID', axis=1, inplace=True)  # drop uninformative column
 
         np.random.seed(42)
         self.o = DeploySupervisedModel(modeltype='classification',

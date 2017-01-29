@@ -14,7 +14,9 @@ class TestRFDevTuneFalse(unittest.TestCase):
                          na_values=['None'])
 
         # Drop uninformative columns
+        # pylint: disable=no-member
         df.drop(['PatientID', 'InTestWindowFLG'], axis=1, inplace=True)
+        # pylint: enable=no-member
 
         # Convert numeric columns to factor/category columns
         np.random.seed(42)
@@ -38,7 +40,9 @@ class TestRFDevTuneTrueRegular(unittest.TestCase):
                          na_values=['None'])
 
         # Drop uninformative columns
+        # pylint: disable=no-member
         df.drop(['PatientID', 'InTestWindowFLG'], axis=1, inplace=True)
+        # pylint: enable=no-member
 
         np.random.seed(42)
         self.o = DevelopSupervisedModel(modeltype='classification',
@@ -83,7 +87,9 @@ class TestLinearDevTuneFalse(unittest.TestCase):
                          na_values=['None'])
 
         # Drop uninformative columns
+        # pylint: disable=no-member
         df.drop(['PatientID', 'InTestWindowFLG'], axis=1, inplace=True)
+        # pylint: enable=no-member
 
         np.random.seed(42)
         self.o = DevelopSupervisedModel(modeltype='classification',
