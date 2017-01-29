@@ -244,7 +244,7 @@ class DevelopSupervisedModel(object):
         else:
             algo = None
 
-        self.y_probab_linear, self.au_roc = model_eval.clfreport(
+        self.y_probab_linear, self.au_roc, clf = model_eval.clfreport(
                                                 modeltype=self.modeltype,
                                                 debug=debug,
                                                 devcheck='yesdev',

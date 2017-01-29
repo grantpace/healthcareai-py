@@ -101,7 +101,7 @@ def clfreport(modeltype,
         if (not hasattr(clf, 'feature_importances_')) and (not
             hasattr(clf, 'best_estimator_')):
 
-            return y_pred, roc_auc
+            return y_pred, roc_auc, clf
 
         # Print variable importance if rf and not tuning
         elif hasattr(clf, 'feature_importances_'):
@@ -140,7 +140,7 @@ def clfreport(modeltype,
         elif modeltype == 'regression':
             y_pred = clf.predict(X_test)
 
-    return y_pred
+    return y_pred, None, None
 
 def findtopthreefactors(debug,
                         X_train,
