@@ -161,46 +161,30 @@ class TestDataframeAndColumnValidation(unittest.TestCase):
     df = pd.read_csv(fixture('HCPyDiabetesClinical.csv'),
                      na_values=['None'])
 
-    def test_raise_error_on_null_dataframe(self):
-        self.assertEqual(
-            'There may be a problem. Your dataframe is null.',
-            DevelopSupervisedModel.validate_dataframe_and_column(dataframe=None, column='GenderFLG'))
-
-    def test_raise_error_on_null_column(self):
-        self.assertEqual(
-            'There may be a problem. Your column is null.',
-            DevelopSupervisedModel.validate_dataframe_and_column(dataframe=self.df, column=None))
-
     def test_raise_error_on_string_type(self):
+        with self.assertRaises(TypeError) as contextManager:
+            DevelopSupervisedModel.validate_dataframe_and_column(dataframe='garbage', column='GenderFLG')
+
         self.assertEqual(
-            'There may be a problem. You did not pass in a dataframe.',
-            DevelopSupervisedModel.validate_dataframe_and_column(dataframe='garbage', column='GenderFLG'))
+            contextManager.exeception.args[0],
+            dsm.DATA_FRAME_ERROR_MSG)
 
     def test_raise_error_on_non_existent_column(self):
-        non_existant_column = 'fake_column'
+        non_existent_column = 'fake_column'
+        with self.assertRaises(dsm.ColumnError) as contextManager:
+            DevelopSupervisedModel.validate_dataframe_and_column(dataframe=self.df, column=non_existent_column)
+
         self.assertEqual(
-            'There may be a problem. The column %s does not exist.' % non_existant_column,
-            DevelopSupervisedModel.validate_dataframe_and_column(dataframe=self.df, column=non_existant_column))
+            contextManager.exception.args[0],
+            dsm.COLUMN_ERROR_MSG % non_existent_column)
 
     def test_successful_validation(self):
-        self.assertTrue(DevelopSupervisedModel.validate_dataframe_and_column(dataframe=self.df, column='GenderFLG'))
+        # If any exception is raised, the test will fail.
+        DevelopSupervisedModel.validate_dataframe_and_column(dataframe=self.df, column='GenderFLG')
 
 
 class TestDataframeAndColumnValidationInContextOfModels(unittest.TestCase):
     # Test the validation function in context of developing a model
-    def test_raise_error_on_null_dataframe_on_classification_and_regression(self):
-        for model in ['regression', 'classification']:
-            try:
-                o = DevelopSupervisedModel(modeltype=model,
-                                           df=None,
-                                           predictedcol=None,
-                                           impute=True)
-            except RuntimeError as e:
-                correct_error = 'There may be a problem. Your dataframe is null.'
-                self.assertEqual(correct_error, e.args[0])
-            else:
-                self.fail('No error raised.')
-
     def test_raise_error_on_non_dataframe_on_classification_and_regression(self):
         not_a_dataframe = [1,2,3,4,5]
         for model in ['regression', 'classification']:
@@ -211,21 +195,6 @@ class TestDataframeAndColumnValidationInContextOfModels(unittest.TestCase):
                                            impute=True)
             except RuntimeError as e:
                 correct_error = 'There may be a problem. You did not pass in a dataframe.'
-                self.assertEqual(correct_error, e.args[0])
-            else:
-                self.fail('No error raised.')
-
-    def test_raise_error_on_null_column_on_classification_and_regression(self):
-        df = pd.read_csv(fixture('HCPyDiabetesClinical.csv'),
-                         na_values=['None'])
-        for model in ['regression', 'classification']:
-            try:
-                o = DevelopSupervisedModel(modeltype=model,
-                                           df=df,
-                                           predictedcol=None,
-                                           impute=True)
-            except RuntimeError as e:
-                correct_error = 'There may be a problem. Your column is null.'
                 self.assertEqual(correct_error, e.args[0])
             else:
                 self.fail('No error raised.')

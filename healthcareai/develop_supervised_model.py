@@ -174,7 +174,7 @@ class DevelopSupervisedModel(object):
 
 
     @staticmethod
-    def validate_dataframe_and_column(dataframe=None, column=None):
+    def validate_dataframe_and_column(dataframe, column):
         """
         Validates that a given dataframe is a pandas dataframe that contains the specified column.
         Intentionally tries to be helpful by printing human readable error messages rather than returning False.
@@ -182,13 +182,6 @@ class DevelopSupervisedModel(object):
         :param column: the column name
         :return: True or returns various helpful errors upon failures.
         """
-
-        if dataframe is None:
-            return ('There may be a problem. Your dataframe is null.')
-
-        if column is None:
-            return ('There may be a problem. Your column is null.')
-
         if type(dataframe) is not pd.core.frame.DataFrame:
             return ('There may be a problem. You did not pass in a dataframe.')
         else:
