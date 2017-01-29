@@ -103,3 +103,6 @@ ENV/
 
 #Pickled results
 *.pkl
+
+# Swap Files
+\.*.sw[a-z]
