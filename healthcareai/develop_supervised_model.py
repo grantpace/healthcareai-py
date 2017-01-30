@@ -198,6 +198,9 @@ class DevelopSupervisedModel(object):
         :return: True or False
         """
 
+        # There are many more numpy data types that are numeric. In fact, I'm
+        # pretty sure most of them are numeric. Are these three the ONLY three
+        # supported data types? -- Jonathan
         return dataframe[column].dtype in [np.integer, np.number, np.float]
 
 
