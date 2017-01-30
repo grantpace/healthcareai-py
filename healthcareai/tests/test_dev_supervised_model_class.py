@@ -117,16 +117,15 @@ class TestErrorHandlingOnIncorrectColumnsForModels(unittest.TestCase):
         df[predictedcol] = np.random.choice([1,2], df.shape[0])
 
         np.random.seed(42)
-        try:
-            o = DevelopSupervisedModel(modeltype='regression',
-                                       df=df,
-                                       predictedcol=predictedcol,
-                                       impute=True)
-        except RuntimeError as e:
-            correct_error = dsm.REGRESSION_ERROR_BINARY % predictedcol
-            self.assertEqual(correct_error, e.args[0])
-        else:
-            self.fail('No error raised.')
+        with self.assertRaises(TypeError) as contextManager:
+            DevelopSupervisedModel(
+                modeltype='regression',
+                df=df,
+                predictedcol=predictedcol,
+                impute=True)
+
+        correct_error = dsm.REGRESSION_ERROR_BINARY % predictedcol
+        self.assertEqual(correct_error, contextManager.exception.args[0])
 
     def test_raise_error_on_regression_with_non_numeric_column(self):
         df = pd.read_csv(fixture('HCPyDiabetesClinical.csv'),
@@ -135,32 +134,29 @@ class TestErrorHandlingOnIncorrectColumnsForModels(unittest.TestCase):
 
         np.random.seed(42)
         predictedcol = 'NonNumericColumn'
-        try:
-            o = DevelopSupervisedModel(modeltype='regression',
-                                       df=df,
-                                       predictedcol=predictedcol,
-                                       impute=True)
-        except RuntimeError as e:
-            correct_error = dsm.REGRESSION_ERROR_NON_NUMERIC % predictedcol
-            self.assertEqual(correct_error, e.args[0])
-        else:
-            self.fail('No error raised.')
+        with self.assertRaises(TypeError) as contextManager:
+            DevelopSupervisedModel(
+                modeltype='regression',
+                df=df,
+                predictedcol=predictedcol,
+                impute=True)
+        correct_error = dsm.REGRESSION_ERROR_NON_NUMERIC % predictedcol
+        self.assertEqual(correct_error, contextManager.exception.args[0])
 
     def test_raise_error_on_classification_with_numeric_column(self):
         df = pd.read_csv(fixture('HCPyDiabetesClinical.csv'),
                          na_values=['None'])
         predictedcol = 'A1CNBR'
         np.random.seed(42)
-        try:
-            o = DevelopSupervisedModel(modeltype='classification',
-                                       df=df,
-                                       predictedcol=predictedcol,
-                                       impute=True)
-        except RuntimeError as e:
-            correct_error = dsm.CLASSIFICATION_ERROR % predictedcol
-            self.assertEqual(correct_error, e.args[0])
-        else:
-            self.fail('No error raised.')
+        with self.assertRaises(TypeError) as contextManager:
+            DevelopSupervisedModel(
+                modeltype='classification',
+                df=df,
+                predictedcol=predictedcol,
+                impute=True)
+
+        correct_error = dsm.CLASSIFICATION_ERROR % predictedcol
+        self.assertEqual(correct_error, contextManager.exception.args[0])
 
 
 class TestDataframeAndColumnValidation(unittest.TestCase):

@@ -82,12 +82,12 @@ class DevelopSupervisedModel(object):
             if not self.is_column_numeric(dataframe=self.df, column=self.predictedcol):
                 error_message = (REGRESSION_ERROR_NON_NUMERIC % self.predictedcol)
                 print(error_message)
-                raise RuntimeError(error_message)
+                raise TypeError(error_message)
 
             if self.is_column_binary(dataframe=self.df, column=self.predictedcol):
                 error_message = (REGRESSION_ERROR_BINARY % self.predictedcol)
                 print(error_message)
-                raise RuntimeError(error_message)
+                raise TypeError(error_message)
 
         if debug:
             print('Shape and top 5 rows of original dataframe:')
@@ -135,7 +135,7 @@ class DevelopSupervisedModel(object):
                 self.df[self.predictedcol].replace(['Y', 'N'], [1, 0], inplace=True)
             else:
                 print(CLASSIFICATION_ERROR % self.predictedcol)
-                raise RuntimeError(CLASSIFICATION_ERROR % self.predictedcol)
+                raise TypeError(CLASSIFICATION_ERROR % self.predictedcol)
 
             if debug:
                 print('\nDataframe after converting to 1/0 instead of Y/N for '
